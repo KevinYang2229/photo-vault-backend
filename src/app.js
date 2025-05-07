@@ -1,17 +1,17 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import photoRoutes from "./routes/photoRoutes.js";
 import albumRoutes from "./routes/albumRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-import { authenticateToken } from "./controllers/authController.js";
-
-dotenv.config();
+import infoRoutes from "./routes/infoRoutes.js";
+import { authenticateToken } from "./middlewares/authMiddleware.js";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
 
 const app = express();
-const port = 3001;
+const swaggerDocument = YAML.load("./swagger.yaml");
 
 var corsOptions = {
   origin: "http://localhost:5173", // 允許的來源
@@ -31,17 +31,20 @@ app.use(express.json());
 // 提供靜態檔案存取
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 // 公開路由（不需要驗證）
-app.use("/api/v1/auth", authRoutes);
+app.use("/", infoRoutes); // 提供資訊的路由
+app.use("/api/v1/auth", authRoutes); // 認證路由
+app.use("/info", infoRoutes);
+
+// Swagger API documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // 需要驗證的路由
 app.use(authenticateToken); // 從這裡開始，所有路由都需要驗證
 app.use("/api/v1/photos", photoRoutes);
 app.use("/api/v1/albums", albumRoutes);
 
-// 啟動伺服器
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+export default app;

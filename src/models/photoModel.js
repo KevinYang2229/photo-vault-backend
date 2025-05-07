@@ -1,16 +1,4 @@
-import dotenv from "dotenv";
-import { Pool } from "pg";
-
-// 載入環境變數
-dotenv.config();
-
-const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-});
+import pool from "../server.js";
 
 // 新增圖片資料
 export const insertPhoto = async (filename, filepath, thumbnailPath) => {

@@ -10,8 +10,6 @@ import {
 // 上傳圖片
 export const uploadPhoto = async (req, res) => {
   try {
-    console.log(res);
-
     const file = req.file;
     if (!file) return res.status(400).send("No file uploaded.");
 
@@ -47,8 +45,10 @@ export const getPhotos = async (req, res) => {
 // 刪除圖片
 export const deletePhoto = async (req, res) => {
   const { id } = req.params;
+
   try {
     const photo = await getPhotoById(id);
+
     if (!photo) return res.status(404).send("Photo not found.");
 
     // 刪除實體檔案
@@ -57,7 +57,7 @@ export const deletePhoto = async (req, res) => {
 
     // 刪除資料庫紀錄
     await deletePhotoById(id);
-    res.send("Photo deleted successfully.");
+    res.send({ msg: "Photo deleted successfully." });
   } catch (error) {
     console.error("Error deleting photo:", error);
     res.status(500).send("Internal server error.");

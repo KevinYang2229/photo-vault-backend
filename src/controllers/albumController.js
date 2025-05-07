@@ -36,7 +36,7 @@ export const deleteAlbum = async (req, res) => {
     const album = await deleteAlbumById(id);
     if (!album) return res.status(404).send("Album not found.");
 
-    res.send("Album deleted successfully.");
+    res.send({ msg: "Album deleted successfully." });
   } catch (error) {
     console.error("Error deleting album:", error);
     res.status(500).send("Internal server error.");
