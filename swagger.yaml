@@ -1,0 +1,220 @@
+openapi: 3.0.0
+info:
+  title: Photo Vault API
+  description: API for managing photo albums and photos.
+  version: v1
+servers:
+  - url: http://localhost:3000
+    description: Local server
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - BearerAuth: []
+tags: # 定義分類標籤
+  - name: Authentication
+    description: APIs related to user authentication
+  - name: Photos
+    description: APIs for managing photos
+  - name: Albums
+    description: APIs for managing albums
+  - name: Utility
+    description: Utility APIs
+paths:
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Authentication # 分類到 Authentication
+      summary: Register a new user
+      security: [] # 覆蓋全域的 security，這裡不需要授權
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        201:
+          description: User registered successfully
+        400:
+          description: Username and password are required or username already exists
+        500:
+          description: Internal server error
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication # 分類到 Authentication
+      summary: Login a user
+      security: [] # 覆蓋全域的 security，這裡不需要授權
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        200:
+          description: User logged in successfully
+        401:
+          description: Invalid username or password
+        500:
+          description: Internal server error
+  /api/v1/auth/refresh-token:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+              required:
+                - refreshToken
+      responses:
+        200:
+          description: Access token refreshed successfully
+        401:
+          description: Refresh token is required
+        403:
+          description: Invalid refresh token
+  /api/v1/photos:
+    post:
+      tags:
+        - Photos # 分類到 Photos
+      summary: Upload a photo
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        201:
+          description: Photo uploaded successfully
+        400:
+          description: No file uploaded
+        500:
+          description: Internal server error
+    get:
+      tags:
+        - Photos # 分類到 Photos
+      summary: Get all photos
+      responses:
+        200:
+          description: List of photos
+        500:
+          description: Internal server error
+  /api/v1/photos/{id}:
+    delete:
+      tags:
+        - Photos # 分類到 Photos
+      summary: Delete a photo
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Photo deleted successfully
+        404:
+          description: Photo not found
+        500:
+          description: Internal server error
+  /api/v1/albums:
+    post:
+      tags:
+        - Albums # 分類到 Albums
+      summary: Create an album
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+              required:
+                - name
+      responses:
+        201:
+          description: Album created successfully
+        400:
+          description: Album name is required
+        500:
+          description: Internal server error
+    get:
+      tags:
+        - Albums # 分類到 Albums
+      summary: Get all albums
+      responses:
+        200:
+          description: List of albums
+        500:
+          description: Internal server error
+  /api/v1/albums/{id}:
+    delete:
+      tags:
+        - Albums # 分類到 Albums
+      summary: Delete an album
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Album deleted successfully
+        404:
+          description: Album not found
+        500:
+          description: Internal server error
+  /version:
+    get:
+      tags:
+        - Utility # 分類到 Utility
+      summary: Get API version information
+      responses:
+        200:
+          description: API version information
+  /static-path:
+    get:
+      tags:
+        - Utility # 分類到 Utility
+      summary: Get static folder path
+      responses:
+        200:
+          description: Static folder path
